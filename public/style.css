@@ -1,1 +1,22 @@
 :root{font-family:'Malgun Gothic',sans-serif;color:#244638;background:#edf1eb}*{box-sizing:border-box}body{margin:0}main{max-width:1500px;margin:auto;padding:28px}header{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}h1{font-size:30px}h2{font-size:22px}input,button,a.button{font:inherit;border-radius:10px;padding:12px;border:1px solid #b4c7b9}button,a.button{background:#315e4e;color:white;cursor:pointer;text-decoration:none}button:disabled{opacity:.5}input{background:white;max-width:100%}.panel,article{background:#fffef8;border:1px solid #d4dfd1;border-radius:20px;padding:24px;margin:18px 0}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}.grid article{margin:0}small,.muted{color:#647b6a}#code{font-size:54px;letter-spacing:8px;font-weight:bold}#error{color:#b42318;min-height:24px}.readings{font-size:28px;font-weight:bold;display:flex;gap:24px;flex-wrap:wrap}svg{width:100%;height:180px;background:#f1f5ed;border-radius:12px}progress{width:100%;accent-color:#315e4e}.offline{opacity:.65}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:inherit}summary{cursor:pointer;padding:12px 0;font-weight:bold}a{color:#315e4e}.actions{display:flex;gap:10px;flex-wrap:wrap}label{display:block;margin:12px 0}#studentLink{overflow-wrap:anywhere}dialog{border:0;border-radius:18px;max-width:600px;width:90%}button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid #b98428;outline-offset:3px}@media(max-width:1000px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:620px){main{padding:16px}.grid{grid-template-columns:1fr}#code{font-size:36px}}
+
+/* Blackboard readability and the same rounded typefaces as the student app. */
+:root{font-family:'Gowun Dodum','Malgun Gothic',sans-serif;color:#173c2c;background:#e9ede7}
+body,input,pre{font-family:'Gowun Dodum','Malgun Gothic',sans-serif}
+h1,h2,h3,button,a.button,summary,.readings,#code{font-family:'Jua','Gowun Dodum',sans-serif;font-weight:400}
+main{max-width:1920px;padding:20px 28px}
+h1{font-size:32px;margin:12px 0}h2{font-size:28px;margin:0}h3{font-size:21px}
+.grid{gap:16px}.grid article{padding:20px 22px;border:2px solid #c9d5c5;background:#fffefb;box-shadow:0 3px 10px #24463808}
+.grid article>header{gap:8px}.grid article>header span{font-size:17px;font-weight:700;color:#173c2c;padding:7px 10px;background:#eaf0e5;border-radius:10px}
+.grid article>p{font-size:18px;line-height:1.5;margin:12px 0;color:#264b38;font-weight:700}
+.readings{font-size:34px;line-height:1.25;gap:26px;color:#173c2c}
+.offline{opacity:1}.offline>header span{color:#8b3b18!important;background:#fff0df!important}
+small,.muted{color:#415c47;font-size:15px}
+progress{height:10px;display:block;margin:8px 0 12px}
+.teacher-plot{position:relative;height:clamp(230px,28vh,370px);width:100%;background:#fffefb;border-radius:12px;padding:4px}
+summary{font-size:20px;color:#173c2c;padding:12px 0 2px}pre{font-size:17px;line-height:1.7}
+input,button,a.button{font-size:18px}button,a.button{font-family:'Jua','Gowun Dodum',sans-serif}
+#roomPanel{padding:18px 22px}#roomPanel h2{font-size:23px}#code{font-size:44px;letter-spacing:6px}
+#roomPanel p{margin:8px 0}#error:empty{display:none}
+@media(min-width:1100px){:fullscreen main>header h1{font-size:26px}:fullscreen #roomPanel{margin:10px 0}:fullscreen .teacher-plot{height:clamp(210px,26vh,330px)}}
+@media(max-width:620px){main{padding:14px}.readings{font-size:30px}.teacher-plot{height:300px}}

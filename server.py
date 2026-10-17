@@ -35,7 +35,7 @@ class Handler(BaseHTTPRequestHandler):
         return SESSIONS.get(token, 0) > time.time()
     def do_GET(self):
         path = self.path.split('?')[0]
-        files = {'/':'index.html','/teacher':'teacher.html','/student':'student.html','/sync.js':'sync.js','/style.css':'style.css'}
+        files = {'/':'index.html','/teacher':'teacher.html','/student':'student.html','/sync.js':'sync.js','/teacher-chart.js':'teacher-chart.js','/style.css':'style.css'}
         if path in files:
             p = ROOT / 'public' / files[path]
             kind = 'text/javascript' if p.suffix == '.js' else 'text/css' if p.suffix == '.css' else 'text/html'
