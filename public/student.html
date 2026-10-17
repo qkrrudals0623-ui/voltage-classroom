@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>WL102C 전압과 전류 실험</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Jua&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Gowun Dodum', '맑은 고딕', sans-serif;
+      background-color: #ffffff;
+      color: #111827;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .font-mono-num {
+      font-family: 'Jua', 'Gowun Dodum', sans-serif;
+      font-variant-numeric: tabular-nums;
+    }
+    #experimentGuide { width: min(720px, calc(100vw - 32px)); max-height: 85dvh; padding: 0; border: 0; border-radius: 20px; color: #0f172a; background: white; box-shadow: 0 24px 70px #0f172a40; }
+    #experimentGuide::backdrop { background: #0f172a80; }
+    #experimentGuide .guide-header { position: sticky; top: 0; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 24px; background: white; border-bottom: 1px solid #e2e8f0; }
+    #experimentGuide h2 { margin: 0; font-size: 21px; font-weight: 700; }
+    #experimentGuide .guide-close { padding: 8px 14px; border: 1px solid #cbd5e1; border-radius: 10px; background: #f8fafc; font-size: 14px; cursor: pointer; }
+    #experimentGuide .guide-body { padding: 8px 24px 24px; font-size: 16px; line-height: 1.85; user-select: text; }
+    #experimentGuide ol { list-style: decimal; padding-left: 24px; margin: 0; }
+    #experimentGuide ol > li { padding-left: 6px; margin-top: 18px; }
+    #experimentGuide li::marker { color: #0369a1; font-weight: 700; }
+    #experimentGuide ul { list-style: disc; padding-left: 22px; margin-top: 8px; font-size: 15px; }
+    #experimentGuide strong { color: #075985; font-weight: 700; }
+    #experimentGuide .zero-guide { background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 12px; padding: 12px 16px; margin-top: 8px; }
+    #nextStepDialog { margin: auto; width: min(480px, calc(100vw - 32px)); border: 0; border-radius: 20px; padding: 28px; text-align: center; background: white; color: #0f172a; box-shadow: 0 24px 70px #0f172a40; }
+    #nextStepDialog::backdrop { background: #0f172a70; }
+    #nextStepMessage { white-space: pre-line; margin: 12px 0 24px; font-size: clamp(20px, 4vw, 26px); line-height: 1.6; font-weight: 700; word-break: keep-all; }
+    #nextStepDialog button { padding: 10px 28px; border-radius: 12px; border: 0; background: #0284c7; color: white; font-size: 16px; font-weight: 700; cursor: pointer; }
+    @keyframes actionPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(2,132,199,.55); }
+      50% { box-shadow: 0 0 0 9px rgba(2,132,199,0); }
+    }
+    .action-pulse:not(:disabled) { animation: actionPulse 1.4s ease-in-out infinite; outline: 2px solid #0284c7; outline-offset: 3px; }
+    @media (prefers-reduced-motion: reduce) {
+      .action-pulse:not(:disabled) { animation: none; outline: 3px solid #0284c7; }
+    }
+    #submissionPanel { box-sizing: border-box; width: calc(100% - 24px); max-width: 896px; margin: 16px auto 24px; padding: 20px 16px; border: 1px solid #bae6fd; border-radius: 18px; background: #f0f9ff; text-align: center; }
+    #submissionPanel h2 { margin: 0 0 12px; font-size: 20px; font-weight: 700; color: #075985; }
+    #submissionPanel p { margin: 12px 0 0; font-size: 14px; line-height: 1.7; color: #475569; word-break: keep-all; }
+    #submissionPanel a { display: block; width: 100%; max-width: 184px; margin: 0 auto; border-radius: 12px; }
+    #submissionPanel a:focus-visible { outline: 3px solid #0284c7; outline-offset: 4px; }
+    #submissionPanel img { display: block; width: 100%; height: auto; border-radius: 12px; }
+    @media (min-width: 1360px) {
+      #submissionPanel { position: fixed; left: max(16px, calc(50vw - 672px)); top: 128px; width: 200px; margin: 0; z-index: 10; }
+    }
+
+    /* Green and ivory workspace; all existing IDs and event handlers are retained. */
+    body {background:#e9ede7!important;color:#263d35!important;}
+    #experimentWorkspace.iv-layout {max-width:1500px;width:100%;min-height:100dvh;margin:0 auto;padding:28px;display:grid;grid-template-columns:320px minmax(0,1fr);gap:24px;align-items:start;}
+    .iv-sidebar {padding:24px;background:#f8f5ec;border:1px solid #d7dfd3;border-radius:24px;display:flex;flex-direction:column;gap:20px;min-width:0;}
+    .iv-title h1 {margin:0;font-size:24px;font-weight:800;letter-spacing:-1px;}
+    .iv-title p {margin:8px 0 0;font-size:13px;color:#728171;}
+    .iv-sidebar header {display:flex;flex-direction:column;align-items:stretch;gap:14px;padding:0 0 20px;background:transparent;border-bottom:1px solid #dce1d5;}
+    .iv-sidebar header>div {min-width:0;}
+    #statusText {font-size:12px;line-height:1.6;color:#697b65;overflow-wrap:anywhere;}
+    .iv-sidebar button {width:100%;justify-content:center;border-radius:12px!important;padding:12px 14px!important;font-size:13px!important;font-weight:700!important;box-shadow:none;border:1px solid #bdc9bf!important;background:#fffef9!important;color:#365447!important;}
+    .iv-sidebar #btnBleConnect,.iv-sidebar #btnStartStop {background:#315e4e!important;color:#fffef9!important;border-color:#315e4e!important;}
+    .iv-sidebar #btnBleConnect:hover:not(:disabled),.iv-sidebar #btnStartStop:hover:not(:disabled){background:#244b3d!important;}
+    .iv-sidebar button:disabled {background:#e4e8e0!important;color:#95a195!important;border-color:#d6ddd3!important;opacity:1;}
+    .iv-sidebar button:focus-visible,.iv-answers textarea:focus-visible {outline:3px solid #9a784b;outline-offset:3px;}
+    .iv-sidebar #btnExperimentGuide {background:#eef0e4!important;}
+    .iv-readings {display:flex;flex-direction:column;gap:12px;}
+    .iv-readings section {padding:18px 16px;background:#e5ecdf;border:1px solid #d0dcc8;border-radius:18px;}
+    .iv-readings section>div>div:first-child {font-size:12px;color:#697b65;}
+    #currentValue,#voltageValue {font-size:32px!important;color:#294837;letter-spacing:-1px;}
+    .iv-readings .text-sky-600 {color:#59744f;}
+    .iv-readings #btnZero,.iv-readings #voltageZero {width:auto;flex-shrink:0;padding:10px 12px!important;background:#f8fbf4!important;}
+    .iv-actions {display:flex;flex-direction:column;gap:12px;}
+    .iv-actions #btnStartStop {padding:15px!important;font-size:14px!important;}
+    .iv-actions #btnReset {background:transparent!important;font-weight:500!important;}
+    #submissionPanel {position:static!important;left:auto!important;top:auto!important;z-index:auto!important;width:100%!important;max-width:none!important;margin:0!important;padding:18px 12px!important;background:#eff0e5!important;border:1px solid #d6decf!important;border-radius:16px!important;}
+    #submissionPanel h2 {font-size:17px;color:#365447;}
+    #submissionPanel p {font-size:12px;color:#74816e;}
+    #submissionPanel a {max-width:160px;}
+    .iv-results {min-width:0;display:flex;flex-direction:column;gap:20px;}
+    .iv-graph {background:#fffefb;border:1px solid #d7dfd3;border-radius:24px;padding:26px;min-width:0;}
+    .iv-graph-heading {display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:20px;}
+    .iv-graph-heading h2,.iv-answers>h2 {margin:0;font-size:18px;font-weight:700;}
+    .iv-graph-heading span {color:#8a9484;font-size:12px;}
+    .iv-plot {position:relative;width:100%;height:clamp(420px,70vh,760px);}
+    .iv-answers {background:#f8f5ec;border:1px solid #d7dfd3;border-radius:24px;padding:24px;}
+    .iv-answers>h2 {margin-bottom:16px;}
+    .iv-answers section {padding:0;background:transparent;border:0;}
+    .iv-answers label {color:#365447;line-height:1.8;}
+    .iv-answers textarea {background:#fffef9;border-color:#c6d1bf;color:#263d35;}
+    [data-group],#nextStepDialog button {background:#315e4e!important;color:#fffef9!important;}
+    #groupChooser>div,#nextStepDialog,#experimentGuide {background:#fffefb;}
+    #experimentGuide .guide-header {background:#fffefb;}
+    #experimentGuide strong,#experimentGuide li::marker,#nextStepTitle {color:#365447;}
+    #experimentGuide .zero-guide {background:#eef3e8;border-color:#c6d5bc;}
+    #toastBox {background:#294536;color:#fffef9;}
+    @keyframes actionPulse {0%,100%{box-shadow:0 0 0 0 rgba(49,94,78,.55)}50%{box-shadow:0 0 0 9px rgba(49,94,78,0)}}
+    .action-pulse:not(:disabled) {outline-color:#628b4e;}
+    @media(max-width:1050px){#experimentWorkspace.iv-layout{grid-template-columns:280px minmax(0,1fr);padding:18px;gap:16px}.iv-sidebar{padding:20px}.iv-graph{padding:18px}.iv-graph-heading{flex-direction:column;align-items:flex-start}#currentValue,#voltageValue{font-size:28px!important}}
+    @media(max-width:760px){#experimentWorkspace.iv-layout{grid-template-columns:1fr;padding:14px}.iv-plot{height:55vh;min-height:360px}.iv-graph-heading{flex-direction:row;align-items:center}.iv-title h1{font-size:23px}.iv-answers{padding:18px}#submissionPanel a{max-width:150px}}
+    button, h1, h2 { font-family: 'Jua', 'Gowun Dodum', sans-serif; }
+  </style>
+</head>
+<body class="min-h-[100dvh] flex flex-col select-none bg-white text-slate-900">
+
+  <div id="groupChooser" role="dialog" aria-modal="true" aria-labelledby="groupTitle" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/50 p-4">
+    <div class="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
+      <h1 id="groupTitle" class="text-xl font-bold text-center">우리 조를 선택하세요</h1>
+      <p class="mt-2 mb-5 text-sm text-slate-500 text-center">선택한 조가 그래프에 표시됩니다.</p>
+      <div class="grid grid-cols-3 gap-3">
+        <button type="button" data-group="1" class="rounded-xl bg-sky-600 hover:bg-sky-500 px-4 py-4 text-white font-bold focus:outline-none focus:ring-4 focus:ring-sky-300">1조</button>
+        <button type="button" data-group="2" class="rounded-xl bg-sky-600 hover:bg-sky-500 px-4 py-4 text-white font-bold focus:outline-none focus:ring-4 focus:ring-sky-300">2조</button>
+        <button type="button" data-group="3" class="rounded-xl bg-sky-600 hover:bg-sky-500 px-4 py-4 text-white font-bold focus:outline-none focus:ring-4 focus:ring-sky-300">3조</button>
+        <button type="button" data-group="4" class="rounded-xl bg-sky-600 hover:bg-sky-500 px-4 py-4 text-white font-bold focus:outline-none focus:ring-4 focus:ring-sky-300">4조</button>
+        <button type="button" data-group="5" class="rounded-xl bg-sky-600 hover:bg-sky-500 px-4 py-4 text-white font-bold focus:outline-none focus:ring-4 focus:ring-sky-300">5조</button>
+        <button type="button" data-group="6" class="rounded-xl bg-sky-600 hover:bg-sky-500 px-4 py-4 text-white font-bold focus:outline-none focus:ring-4 focus:ring-sky-300">6조</button>
+      </div>
+    </div>
+  </div>
+
+  <dialog id="experimentGuide" aria-labelledby="guideTitle">
+    <div class="guide-header">
+      <h2 id="guideTitle">실험 과정</h2>
+      <form method="dialog"><button class="guide-close" type="submit" autofocus>닫기</button></form>
+    </div>
+    <div class="guide-body">
+      <ol>
+        <li>건전지, 스위치, 전류 센서, 저항판을 직렬로 연결한다.</li>
+        <li>전압 센서를 저항판의 연결된 두 지점에 병렬로 연결한다.</li>
+        <li><strong>센서의 영점을 조절한다.</strong>
+          <div class="zero-guide"><ul>
+            <li>전류 센서: 스위치를 열어 전류가 흐르지 않을 때 영점을 조절한다.</li>
+            <li>전압 센서: 측정 집게를 회로에서 분리하고 두 집게를 서로 연결한 뒤 영점을 조절한다. 조절 후 저항판에 다시 연결한다.</li>
+          </ul></div>
+        </li>
+        <li>건전지를 연결하지 않았을 때(0개)의 전압과 전류를 측정하여 기록한다.</li>
+        <li>건전지 1개를 연결하고 스위치를 닫아 전압과 전류를 측정한다. 측정 후에는 스위치를 연다.</li>
+        <li>건전지를 <strong>직렬로 1개씩 추가</strong>하여 5개까지 같은 방법으로 측정한다. 이때 <strong>저항판의 연결 위치는 바꾸지 않는다.</strong></li>
+        <li>측정 결과를 표에 기록하고, 가로축은 전압, 세로축은 전류로 하여 그래프를 그린다.</li>
+      </ol>
+    </div>
+  </dialog>
+
+  <dialog id="nextStepDialog" aria-labelledby="nextStepTitle" aria-describedby="nextStepMessage">
+    <h2 id="nextStepTitle" class="text-sm font-semibold text-sky-700">다음 실험 안내</h2>
+    <p id="nextStepMessage"></p>
+    <form method="dialog"><button type="submit" autofocus>확인</button></form>
+  </dialog>
+
+  <!-- Toast Message -->
+  <div id="toastBox" class="fixed top-16 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-xl bg-slate-900/90 text-white text-xs font-medium shadow-lg transition-opacity duration-200 opacity-0 pointer-events-none"></div>
+
+  <main id="experimentWorkspace" class="iv-layout">
+    <aside class="iv-sidebar" aria-label="전압·전류 센서 연결 및 측정 조작">
+      <div class="iv-title"><h1>전압과 전류 실험</h1><p>전압과 전류의 관계 알아보기</p></div>
+      <header class="flex items-center justify-between px-4 py-3 border-b border-slate-200 bg-white shrink-0">
+    <div class="flex items-center gap-2">
+      <span id="statusDot" class="w-2.5 h-2.5 rounded-full bg-slate-300"></span>
+      <span id="statusText" class="text-xs font-semibold text-slate-600">블루투스 미연결</span>
+    </div>
+
+    <button id="btnBleConnect" type="button" class="px-3.5 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 active:bg-sky-700 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed text-white text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M7 7l10 10-5 5V2l5 5L7 17"/>
+      </svg>
+      <span id="bleBtnText">블루투스 연결</span>
+    </button>
+  </header>
+      <button id="btnExperimentGuide" type="button" aria-haspopup="dialog" aria-controls="experimentGuide" class="w-full px-4 py-3 rounded-xl border border-sky-200 bg-sky-50 text-sky-800 text-sm font-bold hover:bg-sky-100">실험 과정</button>
+      <div class="iv-readings"><section class="bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 flex items-center justify-between gap-3">
+        <div><div class="text-[11px] text-slate-500 font-medium">측정 전압</div>
+          <div class="flex items-baseline gap-1 mt-0.5"><span id="voltageValue" class="font-mono-num text-2xl sm:text-3xl font-bold text-slate-900">—</span><span class="font-mono-num text-base font-bold text-sky-600">V</span></div>
+        </div>
+        <button id="voltageZero" type="button" disabled class="px-3 py-2 rounded-xl bg-white border border-slate-300 text-slate-700 text-xs font-semibold disabled:opacity-40">영점</button>
+      </section><section class="bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 flex items-center justify-between gap-3">
+        <div><div class="text-[11px] text-slate-500 font-medium">측정 전류</div>
+          <div class="flex items-baseline gap-1 mt-0.5"><span id="currentValue" class="font-mono-num text-2xl sm:text-3xl font-bold text-slate-900">—</span><span class="font-mono-num text-base font-bold text-sky-600">A</span></div>
+        </div>
+        <button id="btnZero" type="button" disabled class="px-3 py-2 rounded-xl bg-white border border-slate-300 text-slate-700 text-xs font-semibold disabled:opacity-40">영점</button>
+      </section></div>
+      <div class="iv-actions"><button id="btnStartStop" type="button" disabled class="px-5 py-2.5 rounded-xl bg-sky-600 text-white text-sm font-bold disabled:bg-slate-200 disabled:text-slate-400">현재 값 측정</button><button id="btnReset" type="button" class="px-4 py-2.5 rounded-xl bg-white border border-slate-300 text-slate-700 text-sm font-semibold">그래프 초기화</button><button id="saveGraph" type="button" class="px-3 py-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-xs font-semibold">그래프·답변 이미지 저장</button></div>
+      <aside id="submissionPanel" aria-labelledby="submissionTitle">
+    <h2 id="submissionTitle">결과 제출하기</h2>
+    <a href="https://padlet.com/berry010404/padlet-s024kvcdik6wu5festxi" target="_blank" rel="noopener noreferrer" aria-label="패들렛에서 실험 결과 제출하기 (새 탭)">
+      <img src="data:image/png;base64,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" width="450" height="450" alt="실험 결과 제출 페이지 QR코드">
+    </a>
+    <p>이미지를 클릭하거나 QR코드를 스캔하여 실험 결과를 제출하세요.</p>
+  </aside>
+    </aside>
+    <div class="iv-results">
+      <section class="iv-graph" aria-labelledby="ivGraphTitle">
+        <div class="iv-graph-heading"><h2 id="ivGraphTitle">전압–전류 그래프</h2><span>가로축 전압 · 세로축 전류</span></div>
+        <div class="iv-plot"><canvas id="currentChart"></canvas></div>
+      </section>
+      <div class="iv-answers"><h2>결과 정리</h2><section class="shrink-0 rounded-2xl border border-slate-200 bg-slate-50 p-4 space-y-4">
+      <div>
+        <label for="answer1" class="block text-sm sm:text-base font-semibold mb-2">1. 건전지 수가 늘어나면 전압은 어떻게 변하는가?</label>
+        <textarea id="answer1" rows="3" maxlength="2000" placeholder="생각한 내용을 입력하세요." class="w-full rounded-xl border border-slate-300 bg-white p-3 text-base select-text" style="resize:vertical;user-select:text"></textarea>
+      </div>
+      <div>
+        <label for="answer2" class="block text-sm sm:text-base font-semibold mb-2">2. 전압이 커지면 전류는 어떻게 변하는가?</label>
+        <textarea id="answer2" rows="3" maxlength="2000" placeholder="생각한 내용을 입력하세요." class="w-full rounded-xl border border-slate-300 bg-white p-3 text-base select-text" style="resize:vertical;user-select:text"></textarea>
+      </div>
+    </section></div>
+    </div>
+  </main>
+
+  <script>
+    (function () {
+      const experimentGuide = document.getElementById('experimentGuide');
+      document.getElementById('btnExperimentGuide').addEventListener('click', () => {
+        experimentGuide.showModal();
+        experimentGuide.scrollTop = 0;
+      });
+      let selectedGroup = null;
+      const live = {enabled:true, points:[], lastSample:0};
+      let unifiedConnecting = false;
+      let measurementBusy = false;
+      const calibration = {current:false, voltage:false, ready:false, bothConnected:false};
+      const state = {
+        isSupportedDevice: true,
+        isConnected: false,
+        isRunning: false,
+        tareOffset: 0.0,
+        rawCurrent: null,
+        lastReceivedMs: 0,
+        packetCount: 0,
+        startTimeMs: 0,
+        elapsedSec: 0,
+        timerId: null,
+        points: [], // { x, y }
+        asciiBuffer: ''
+      };
+
+      // ScienceCube Wireless Sensor Allowed Device Name Prefixes (e.g. "SC:CURR-001", "SC:...", "WL 102C")
+      const ALLOWED_PREFIXES = ['SC:', 'SC-', 'SC_', 'WL', 'ScienceCube'];
+
+      // Supported GATT Service UUIDs for ScienceCube BLE Sensors
+      const SUPPORTED_SERVICES = [
+        '6e400001-b5a3-f393-e0a9-e50e24dcca9e',
+        '0000ffe0-0000-1000-8000-00805f9b34fb',
+        '0000fff0-0000-1000-8000-00805f9b34fb',
+        '49535343-fe7d-4ae5-8fa9-9fafd205e455',
+        '0000181a-0000-1000-8000-00805f9b34fb'
+      ];
+
+      const diagnosticLog = [];
+      let activeDevice = null;
+      let session = 0;
+      let writeChannel = null;
+      let receiveBuffer = [];
+      let commandQueue = Promise.resolve();
+      let idleRequestBusy = false;
+      let lastIdleRequest = 0;
+      let lastTransmitMs = 0;
+      let intentionalDisconnect = false;
+      let connecting = false;
+      // Keep the established protocol active while waiting between voltage measurements.
+      setInterval(async () => {
+        if (!state.isConnected || state.isRunning || connecting || idleRequestBusy || measurementBusy || !activeDevice?.gatt.connected) return;
+        if (performance.now() - lastIdleRequest < 5000) return;
+        idleRequestBusy = true; lastIdleRequest = performance.now();
+        try { await sendCommand(83); }
+        catch(error) { log('대기 중 현재값 요청 실패: ' + error.name + ': ' + error.message); }
+        finally { idleRequestBusy = false; }
+      },1000);
+      let decodedCount = 0;
+      function makeFrame(command, params = []) {
+        const body = new Uint8Array(12); body[0] = command;
+        body.set(params.slice(0,10),1);
+        body[11] = body.slice(0,11).reduce((a,b)=>(a+b)&255,0);
+        return new TextEncoder().encode('{{' + btoa(String.fromCharCode(...body)) + '}}');
+      }
+      function sendCommand(command, params = []) {
+        const channel = writeChannel;
+        const commandSession = session;
+        const job = commandQueue.then(async () => {
+          if (commandSession !== session || channel !== writeChannel || !channel || !activeDevice?.gatt.connected) throw new Error('센서가 연결되지 않았습니다.');
+          const frame = makeFrame(command,params);
+          await channel.writeValueWithResponse(frame);
+          lastTransmitMs = performance.now();
+          log('TX ' + command + ' ' + Array.from(frame,b=>b.toString(16).padStart(2,'0')).join(' '));
+        });
+        commandQueue = job.catch(()=>{});
+        return job;
+      }
+      function acceptCurrent(value) {
+        if (!Number.isFinite(value)) { log('유효하지 않은 전류값'); return; }
+        state.rawCurrent = value;
+        state.lastReceivedMs = performance.now();
+        decodedCount++;
+        const calibrated = value - state.tareOffset;
+        document.getElementById('currentValue').textContent = (calibrated >= 0 ? '+' : '') + calibrated.toFixed(3);
+        document.getElementById('statusText').textContent = activeDevice.name + ' · 데이터 수신 중';
+      }
+      function parseFrames(bytes) {
+        receiveBuffer.push(...bytes);
+        while(receiveBuffer.length >= 2) {
+          if(receiveBuffer[0] !== 123 || receiveBuffer[1] !== 123) { receiveBuffer.shift(); continue; }
+          if(receiveBuffer.length < 20) break;
+          if(receiveBuffer[18] !== 125 || receiveBuffer[19] !== 125) { receiveBuffer.shift(); continue; }
+          const frame = receiveBuffer.splice(0,20);
+          try {
+            const body = Uint8Array.from(atob(String.fromCharCode(...frame.slice(2,18))),c=>c.charCodeAt(0));
+            if(body.length !== 12 || body.slice(0,11).reduce((a,b)=>(a+b)&255,0) !== body[11]) { log('체크섬 오류'); continue; }
+            const command = body[0], params = body.slice(1,11);
+            const offset = ({109:1,115:1,116:3,117:2})[command];
+            if(offset !== undefined) acceptCurrent(new DataView(params.buffer,params.byteOffset,params.byteLength).getFloat32(offset,true));
+            else log('응답 CMD ' + command);
+          } catch(error) { log('프레임 해석 오류: ' + error.message); }
+        }
+        if(receiveBuffer.length > 4000) receiveBuffer = receiveBuffer.slice(-19);
+      }
+      function log(message) {
+        diagnosticLog.push(new Date().toISOString() + ' ' + message);
+        if(diagnosticLog.length > 3000) diagnosticLog.splice(0,diagnosticLog.length-3000);
+      }
+      // Official ScienceCube web app identifies SC:VOLT / WL101V as float data.
+      // Shared BLE transport and float offsets verified against the official web bundle.
+      const voltageSensor = {device:null, write:null, connected:false, running:false,
+        connecting:false, session:0, queue:Promise.resolve(), buffer:[], raw:null,
+        zero:0, received:0, count:0, idleAt:0, busy:false};
+      function voltageControls() {
+        updateUnifiedConnection();
+        document.getElementById('voltageZero').disabled = !voltageSensor.connected || voltageSensor.raw === null;
+        updateButtonHints();
+      }
+      function voltageSend(command, params=[]) {
+        const channel = voltageSensor.write, token = voltageSensor.session;
+        const task = voltageSensor.queue.then(async()=>{
+          if(token !== voltageSensor.session || channel !== voltageSensor.write || !channel || !voltageSensor.device?.gatt.connected) throw new Error('전압 센서 미연결');
+          await channel.writeValueWithResponse(makeFrame(command,params));
+          log('WL101V TX ' + command + ' ' + JSON.stringify(params));
+        });
+        voltageSensor.queue = task.catch(()=>{});
+        return task;
+      }
+      function voltageReceive(view) {
+        const bytes = new Uint8Array(view.buffer,view.byteOffset,view.byteLength);
+        log('WL101V RX ' + Array.from(bytes,b=>b.toString(16).padStart(2,'0')).join(' '));
+        const buffer = voltageSensor.buffer;
+        buffer.push(...bytes);
+        while(buffer.length >= 2) {
+          if(buffer[0] !== 123 || buffer[1] !== 123) {buffer.shift();continue;}
+          if(buffer.length < 20) break;
+          if(buffer[18] !== 125 || buffer[19] !== 125) {buffer.shift();continue;}
+          const frame = buffer.splice(0,20);
+          try {
+            const body = Uint8Array.from(atob(String.fromCharCode(...frame.slice(2,18))),c=>c.charCodeAt(0));
+            if(body.length !== 12 || body.slice(0,11).reduce((a,b)=>(a+b)&255,0) !== body[11]) {log('WL101V 체크섬 오류');continue;}
+            const offset = ({109:1,115:1,116:3,117:2})[body[0]];
+            if(offset === undefined) {log('WL101V 응답 CMD '+body[0]);continue;}
+            const value = new DataView(body.buffer,body.byteOffset+1,10).getFloat32(offset,true);
+            if(!Number.isFinite(value)) {log('WL101V 유효하지 않은 값');continue;}
+            voltageSensor.raw=value;voltageSensor.received=performance.now();voltageSensor.count++;
+            voltageDisplay();voltageControls();
+          } catch(error) {log('WL101V decode error: '+error.message);}
+        }
+      }
+      function voltageDisplay() {
+        document.getElementById('voltageValue').textContent = voltageSensor.raw === null ? '—' : (voltageSensor.raw-voltageSensor.zero).toFixed(3);
+      }
+      async function connectVoltage() {
+        if(voltageSensor.connecting) return;
+        if(voltageSensor.device?.gatt.connected) {voltageSensor.device.gatt.disconnect();return;}
+        if(!navigator.bluetooth) {showToast('Web Bluetooth를 지원하는 Chrome 또는 Edge에서 열어 주세요.');return;}
+        voltageSensor.connecting=true;voltageControls();
+        const token=++voltageSensor.session;
+        try {
+          const device=voltageSensor.device || await navigator.bluetooth.requestDevice({filters:['SC:VOLT','WL101','WL 101'].map(namePrefix=>({namePrefix})),optionalServices:SUPPORTED_SERVICES});
+          if(!/^(SC:VOLT|WL\s?101)/i.test(device.name || '')) throw new Error('WL101V 전압 센서를 선택해 주세요.');
+          if(device === activeDevice || (activeDevice && device.id === activeDevice.id)) throw new Error('전류 센서와 다른 WL101V 전압 센서를 선택해 주세요.');
+          voltageSensor.device=device;
+          voltageSensor.raw=null;voltageSensor.received=0;voltageSensor.buffer=[];voltageDisplay();
+          device.addEventListener('gattserverdisconnected',()=>{
+            if(token !== voltageSensor.session)return;
+            voltageSensor.connected=false;voltageSensor.running=false;voltageSensor.write=null;
+            if(state.isRunning) stopMeasurement();
+            voltageSensor.raw=null;voltageSensor.received=0;voltageSensor.buffer=[];
+            voltageDisplay();voltageControls();
+            log('WL101V 연결 해제 · 페이지 '+document.visibilityState);
+          });
+          let server;
+          for(let attempt=0;attempt<3;attempt++) {
+            try {server=await device.gatt.connect();break;}
+            catch(error) {if(attempt===2 || error.name!=='NetworkError')throw error;await new Promise(r=>setTimeout(r,500*(attempt+1)));}
+          }
+          const service=await server.getPrimaryService('49535343-fe7d-4ae5-8fa9-9fafd205e455');
+          const notify=await service.getCharacteristic('49535343-1e4d-4bd9-ba61-23c647249616');
+          voltageSensor.write=await service.getCharacteristic('49535343-8841-43f4-a8d4-ecbe34729bb3');
+          notify.addEventListener('characteristicvaluechanged',e=>{if(token===voltageSensor.session)voltageReceive(e.target.value);});
+          await notify.startNotifications();
+          voltageSensor.connected=true;voltageSensor.idleAt=performance.now();
+          await voltageSend(83);
+        } catch(error) {
+          log('WL101V ERROR '+error.name+': '+error.message);
+          if(voltageSensor.device?.gatt.connected)voltageSensor.device.gatt.disconnect();
+          if(error.name!=='NotFoundError')showToast('전압 센서: '+error.message);
+        } finally {voltageSensor.connecting=false;voltageControls();}
+      }
+      document.getElementById('voltageZero').addEventListener('click',()=>{
+        if(voltageSensor.raw===null || performance.now()-voltageSensor.received>2000){showToast('최신 전압값을 받은 뒤 영점을 설정해 주세요.');return;}
+        voltageSensor.zero=voltageSensor.raw;voltageDisplay();showToast('전압 영점 조절 완료');
+        markCalibration('voltage');
+      });
+      setInterval(async()=>{
+        if(!voltageSensor.connected || voltageSensor.running || voltageSensor.connecting || voltageSensor.busy || measurementBusy || performance.now()-voltageSensor.idleAt<5000)return;
+        voltageSensor.busy=true;voltageSensor.idleAt=performance.now();
+        try{await voltageSend(83);}catch(error){log('WL101V idle error: '+error.message);}
+        finally{voltageSensor.busy=false;voltageControls();}
+      },1000);
+
+      let toastTimer = null;
+      function showToast(msg) {
+        const box = document.getElementById('toastBox');
+        box.textContent = msg;
+        box.classList.remove('opacity-0');
+        box.classList.add('opacity-100');
+        if (toastTimer) clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () {
+          box.classList.remove('opacity-100');
+          box.classList.add('opacity-0');
+        }, 2500);
+      }
+
+      // Check device/browser Web Bluetooth hardware support on load
+      async function checkDeviceSupport() {
+        const btnBle = document.getElementById('btnBleConnect');
+        const dot = document.getElementById('statusDot');
+        const statusText = document.getElementById('statusText');
+
+        if (!navigator.bluetooth || typeof navigator.bluetooth.requestDevice !== 'function') {
+          state.isSupportedDevice = false;
+          btnBle.disabled = true;
+          dot.className = 'w-2.5 h-2.5 rounded-full bg-rose-400';
+          statusText.textContent = '블루투스 미지원 기기/브라우저';
+          return;
+        }
+
+        if (typeof navigator.bluetooth.getAvailability === 'function') {
+          try {
+            const available = await navigator.bluetooth.getAvailability();
+            if (!available) {
+              state.isSupportedDevice = false;
+              btnBle.disabled = true;
+              dot.className = 'w-2.5 h-2.5 rounded-full bg-rose-400';
+              statusText.textContent = '블루투스 어댑터 미지원 기기';
+            }
+          } catch (e) {
+            // Ignore permissions policy error in preview iframe until button click
+          }
+        }
+      }
+
+      // Custom plugin to draw crisp black axes, tick marks, and arrowheads like the reference image
+      const crispAxesPlugin = {
+        id: 'crispAxesPlugin',
+        afterDraw: function (chartInstance) {
+          const ctx = chartInstance.ctx;
+          const chartArea = chartInstance.chartArea;
+          const xScale = chartInstance.scales.x;
+          const yScale = chartInstance.scales.y;
+          if (!chartArea || !xScale || !yScale) return;
+
+          const left = chartArea.left;
+          const right = chartArea.right;
+          const top = chartArea.top;
+          const bottom = chartArea.bottom;
+
+          const yZero = Math.max(top, Math.min(bottom, yScale.getPixelForValue(0)));
+          const xAxisPos = left;
+
+          ctx.save();
+          ctx.strokeStyle = '#000000';
+          ctx.fillStyle = '#000000';
+          ctx.lineWidth = 2;
+
+          // 1. Horizontal axis line (y = 0)
+          ctx.beginPath();
+          ctx.moveTo(left, yZero);
+          ctx.lineTo(right, yZero);
+          ctx.stroke();
+
+          // Right arrowhead on X-axis
+          ctx.beginPath();
+          ctx.moveTo(right - 7, yZero - 5);
+          ctx.lineTo(right, yZero);
+          ctx.lineTo(right - 7, yZero + 5);
+          ctx.stroke();
+
+          // 2. Vertical axis line (x = left)
+          ctx.beginPath();
+          ctx.moveTo(xAxisPos, top);
+          ctx.lineTo(xAxisPos, bottom);
+          ctx.stroke();
+
+          // Top arrowhead on Y-axis
+          ctx.beginPath();
+          ctx.moveTo(xAxisPos - 5, top + 7);
+          ctx.lineTo(xAxisPos, top);
+          ctx.lineTo(xAxisPos + 5, top + 7);
+          ctx.stroke();
+
+          // 3. Crisp black tick marks along both axes
+          ctx.lineWidth = 1.5;
+          const xTicks = xScale.ticks || [];
+          for (let i = 0; i < xTicks.length; i++) {
+            const px = xScale.getPixelForTick(i);
+            if (px > left + 4 && px < right - 8) {
+              ctx.beginPath();
+              ctx.moveTo(px, yZero - 4);
+              ctx.lineTo(px, yZero + 4);
+              ctx.stroke();
+            }
+          }
+
+          const yTicks = yScale.ticks || [];
+          for (let j = 0; j < yTicks.length; j++) {
+            const py = yScale.getPixelForTick(j);
+            if (py > top + 8 && py < bottom - 8) {
+              ctx.beginPath();
+              ctx.moveTo(xAxisPos - 4, py);
+              ctx.lineTo(xAxisPos + 4, py);
+              ctx.stroke();
+            }
+          }
+
+          if (selectedGroup !== null) {
+            ctx.font = "18px Jua, sans-serif";
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'top';
+            const label = selectedGroup + '조';
+            const labelWidth = ctx.measureText(label).width;
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(left + 9, top + 9, labelWidth + 16, 28);
+            ctx.fillStyle = '#365447';
+            ctx.fillText(label, left + 17, top + 14);
+          }
+          ctx.restore();
+        }
+      };
+
+      let lineReveal = null;
+      const progressiveLinePlugin = {
+        id: 'progressiveLine',
+        beforeDatasetsDraw(chartInstance) {
+          const points = chartInstance.getDatasetMeta(0).data;
+          const values = chartInstance.data.datasets[0].data;
+          const ctx = chartInstance.ctx;
+          const area = chartInstance.chartArea;
+          ctx.save();
+          ctx.beginPath();
+          ctx.rect(area.left, area.top, area.right-area.left, area.bottom-area.top);
+          ctx.clip();
+          ctx.strokeStyle = '#557e58';
+          ctx.lineWidth = 3;
+          ctx.lineCap = 'round';
+          for (let i = 1; i < points.length; i++) {
+            let from = points[i-1], to = points[i];
+            let progress = 1;
+            if (lineReveal && (values[i-1].x === lineReveal.voltage || values[i].x === lineReveal.voltage)) {
+              progress = lineReveal.progress;
+              // Grow from the existing neighbour toward the recorded point.
+              if (values[i-1].x === lineReveal.voltage) [from, to] = [to, from];
+            }
+            if (progress <= 0) continue;
+            ctx.beginPath();
+            ctx.moveTo(from.x, from.y);
+            ctx.lineTo(from.x + (to.x-from.x)*progress, from.y + (to.y-from.y)*progress);
+            ctx.stroke();
+          }
+          ctx.restore();
+        }
+      };
+
+      let lineAnimationId = null;
+      let lineAnimationResolve = null;
+
+      const ctx = document.getElementById('currentChart').getContext('2d');
+      const chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          datasets: [{
+            label: '전류 (A)',
+            data: [],
+            borderColor: '#557e58',
+            backgroundColor: 'transparent',
+            borderWidth: 3,
+            showLine: false,
+            pointRadius: c => lineReveal && c.raw?.x === lineReveal.voltage ? 0 : 5,
+            pointHoverRadius: c => lineReveal && c.raw?.x === lineReveal.voltage ? 0 : 7,
+            pointHitRadius: c => lineReveal && c.raw?.x === lineReveal.voltage ? 0 : 1,
+            pointBackgroundColor: '#557e58',
+            fill: false,
+            tension: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: false,
+          layout: {
+            padding: { top: 8, right: 10, bottom: 4, left: 4 }
+          },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              enabled: true,
+              backgroundColor: 'rgba(15, 23, 42, 0.9)',
+              displayColors: false,
+              callbacks: {
+                title: function (items) {
+                  return items.length ? Number(items[0].parsed.x).toFixed(3) + ' V' : '';
+                },
+                label: function (c) {
+                  return Number(c.parsed.y).toFixed(3) + ' A';
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              type: 'linear',
+              min: 0,
+              max: 7.5,
+              title: {display:true, text:'전압 (V)'},
+              border: { display: true, color: '#cbd5e1', width: 1 },
+              grid: {
+                color: '#dcdcdc',
+                lineWidth: 1
+              },
+              ticks: {
+                stepSize: 1.5,
+                color: '#475569',
+                font: { family: 'Gowun Dodum', size: 10 },
+                callback: function (v) { return Number(v).toFixed(1) + 'V'; }
+              }
+            },
+            y: {
+              min: 0,
+              suggestedMax: 0.1,
+              title: {display:true, text:'전류 (A)'},
+              border: { display: true, color: '#cbd5e1', width: 1 },
+              grid: {
+                color: '#dcdcdc',
+                lineWidth: 1
+              },
+              ticks: {
+                maxTicksLimit: 7,
+                color: '#475569',
+                font: { family: 'Gowun Dodum', size: 10 },
+                callback: function (v) { return Number(v).toLocaleString('ko-KR', {maximumFractionDigits:3}) + 'A'; }
+              }
+            }
+          }
+        },
+        plugins: [progressiveLinePlugin, crispAxesPlugin]
+      });
+
+      // Compose a single PNG containing the graph, both questions and complete answers.
+      function buildResultImage(source) {
+        const snapshot=document.createElement('canvas');
+        snapshot.width=1200;
+        const context=snapshot.getContext('2d');
+        const margin=40, textWidth=snapshot.width-margin*2, lineHeight=40;
+        function wrapText(text) {
+          const lines=[];
+          for(const paragraph of text.split('\n')) {
+            let line='';
+            for(const char of paragraph) {
+              if(line && context.measureText(line+char).width>textWidth) {lines.push(line);line=char;}
+              else line+=char;
+            }
+            lines.push(line);
+          }
+          return lines;
+        }
+        const questions=[
+          '1. 건전지 수가 늘어나면 전압은 어떻게 변하는가?',
+          '2. 전압이 커지면 전류는 어떻게 변하는가?'
+        ];
+        const blocks=questions.map((question,i)=>{
+          context.font="28px Jua, sans-serif";
+          const title=wrapText(question);
+          context.font="26px \"Gowun Dodum\", sans-serif";
+          const answer=wrapText(document.getElementById('answer'+(i+1)).value || '(답변을 입력하지 않았습니다.)');
+          return {title,answer};
+        });
+        const graphWidth=snapshot.width-margin*2;
+        const graphHeight=Math.round(source.height/source.width*graphWidth);
+        snapshot.height=margin+graphHeight+32+blocks.reduce((sum,b)=>sum+(b.title.length+b.answer.length)*lineHeight+48,0)+margin;
+        context.fillStyle='#ffffff';
+        context.fillRect(0,0,snapshot.width,snapshot.height);
+        context.drawImage(source,margin,margin,graphWidth,graphHeight);
+        context.textBaseline='top';
+        let y=margin+graphHeight+32;
+        for(const block of blocks) {
+          context.fillStyle='#0f172a';context.font="28px Jua, sans-serif";
+          for(const line of block.title) {context.fillText(line,margin,y);y+=lineHeight;}
+          y+=8;
+          context.fillStyle='#334155';context.font="26px \"Gowun Dodum\", sans-serif";
+          for(const line of block.answer) {context.fillText(line,margin,y);y+=lineHeight;}
+          y+=40;
+        }
+        return snapshot;
+      }
+      document.getElementById('saveGraph').addEventListener('click', function () {
+        try {
+          const snapshot = buildResultImage(chart.canvas);
+          snapshot.toBlob(function (blob) {
+            if (!blob) { showToast('그래프와 답변 이미지 저장에 실패했습니다. 다시 시도해 주세요.'); return; }
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            const now = new Date();
+            const stamp = now.getFullYear() + [now.getMonth()+1, now.getDate()].map(n=>String(n).padStart(2,'0')).join('')
+              + '_' + [now.getHours(), now.getMinutes(), now.getSeconds()].map(n=>String(n).padStart(2,'0')).join('');
+            link.href = url;
+            link.download = '전압전류_그래프와답변_' + stamp + '.png';
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            setTimeout(()=>URL.revokeObjectURL(url), 1000);
+            showToast('그래프와 답변 이미지를 저장했습니다.');
+          }, 'image/png');
+        } catch (error) {
+          showToast('그래프와 답변 이미지 저장에 실패했습니다. 다시 시도해 주세요.');
+        }
+      });
+
+      // The experiment becomes interactive only after choosing a group.
+      const experimentHeader = document.querySelector('header');
+      const experimentMain = document.querySelector('main');
+      experimentHeader.inert = true;
+      experimentMain.inert = true;
+      document.querySelectorAll('[data-group]').forEach(button => {
+        button.addEventListener('click', function () {
+          selectedGroup = Number(button.dataset.group);
+          chart.update('none');
+          document.getElementById('groupChooser').remove();
+          experimentHeader.inert = false;
+          experimentMain.inert = false;
+          document.getElementById('btnBleConnect').focus();
+        });
+      });
+      document.querySelector('[data-group]').focus();
+
+      function setControlsEnabled(enabled) {
+        document.getElementById('btnStartStop').disabled = !state.isConnected || !voltageSensor.connected || !calibration.ready;
+        document.getElementById('btnZero').disabled = !enabled;
+        document.getElementById('btnReset').disabled = false;
+      }
+
+      // WL102C framed data is decoded only after checksum validation.
+      function receivePacket(characteristic, dataView) {
+        if (!dataView) return;
+        state.packetCount++;
+        const bytes = new Uint8Array(dataView.buffer, dataView.byteOffset, dataView.byteLength);
+        const hex = Array.from(bytes, b => b.toString(16).padStart(2,'0')).join(' ');
+        const ascii = Array.from(bytes, b => b >= 32 && b <= 126 ? String.fromCharCode(b) : '.').join('');
+        log('RX ' + characteristic.service.uuid + '/' + characteristic.uuid + ' [' + bytes.length + '] ' + hex + ' | ' + ascii);
+        parseFrames(bytes);
+      }
+
+      function renderRecords() {renderLive();updateButtonHints();}
+      function renderLive(animatedVoltage = null) {
+        if(lineAnimationId !== null) cancelAnimationFrame(lineAnimationId);
+        lineAnimationId = null;
+        if(lineAnimationResolve) {lineAnimationResolve(false);lineAnimationResolve=null;}
+        const animate = animatedVoltage !== null && live.points.length > 1;
+        lineReveal = animate ? {voltage:animatedVoltage, progress:0} : null;
+        chart.data.datasets[0].data=live.points;
+        chart.options.scales.x.max=Math.max(7.5,...live.points.map(p=>p.x));
+        chart.update('none');
+        if(!animate)return Promise.resolve(true);
+        return new Promise(resolve=>{
+          lineAnimationResolve=resolve;
+          const started=performance.now();
+          function drawFrame(now) {
+            lineReveal.progress=Math.min(1,(now-started)/2000);
+            chart.draw();
+            if(lineReveal.progress<1) lineAnimationId=requestAnimationFrame(drawFrame);
+            else {
+              lineReveal=null;
+              chart.update('none');
+              // Let the completed line and endpoint reach the screen before the guide opens.
+              lineAnimationId=requestAnimationFrame(()=>{
+                lineAnimationId=null;lineAnimationResolve=null;resolve(true);
+              });
+            }
+          }
+          lineAnimationId=requestAnimationFrame(drawFrame);
+        });
+      }
+      let nextBatteryCount = 0;
+      let previousRecordedVoltage = null;
+      let lastGuidedVoltage = null;
+      const GUIDE_MIN_VOLTAGE_RISE = 0.5;
+      const GUIDE_MAX_VOLTAGE_RISE = 2.0;
+      function showExperimentMessage(message, complete = false) {
+        document.getElementById('nextStepTitle').textContent=complete?'실험 완료':'다음 실험 안내';
+        document.getElementById('nextStepMessage').textContent=message;
+        const dialog=document.getElementById('nextStepDialog');
+        if(!dialog.open)dialog.showModal();
+      }
+      function shouldRecordVoltage(voltage) {
+        if(previousRecordedVoltage === null)return true;
+        const baseline=Math.max(previousRecordedVoltage,lastGuidedVoltage ?? previousRecordedVoltage);
+        const rise=voltage-baseline;
+        return rise >= GUIDE_MIN_VOLTAGE_RISE-1e-9 && rise < GUIDE_MAX_VOLTAGE_RISE-1e-9;
+      }
+      function advanceExperiment(voltage) {
+        previousRecordedVoltage = voltage;
+        if(nextBatteryCount>5)return;
+        lastGuidedVoltage = voltage;
+        nextBatteryCount++;
+        if(nextBatteryCount===6) {
+          showExperimentMessage('실험이 끝났습니다.\n그래프를 해석하여 하단의 결과를 정리하여 제출하세요.',true);
+        } else {
+          showExperimentMessage('다음으로 건전지 '+nextBatteryCount+'개를 연결하여 값을 측정하세요.');
+        }
+      }
+
+      let snapshotGeneration = 0;
+      async function startMeasurement() {
+        if(measurementBusy)return;
+        if(!calibration.ready) {showToast('두 센서의 영점을 먼저 조절해 주세요.');return;}
+        if(!state.isConnected || !voltageSensor.connected) {showToast('먼저 두 센서를 연결해 주세요.');return;}
+        measurementBusy=true;
+        const generation=++snapshotGeneration;
+        const btn=document.getElementById('btnStartStop');
+        btn.disabled=true;btn.textContent='측정 중…';
+        updateButtonHints();
+        try {
+          await Promise.all([commandQueue,voltageSensor.queue]);
+          const currentCount=decodedCount, voltageCount=voltageSensor.count;
+          await Promise.all([sendCommand(83),voltageSend(83)]);
+          const started=performance.now();
+          await new Promise((resolve,reject)=>{
+            function check() {
+              if(generation!==snapshotGeneration)return reject(new Error('측정을 취소했습니다.'));
+              if(!state.isConnected || !voltageSensor.connected)return reject(new Error('센서 연결이 해제되었습니다.'));
+              if(decodedCount>currentCount && voltageSensor.count>voltageCount)return resolve();
+              if(performance.now()-started>3000)return reject(new Error('현재값 응답이 없습니다. 진단 기록을 저장해 주세요.'));
+              setTimeout(check,25);
+            }
+            check();
+          });
+          if(generation!==snapshotGeneration)return;
+          const x=Number((voltageSensor.raw-voltageSensor.zero).toFixed(3));
+          const y=state.rawCurrent-state.tareOffset;
+          if(!Number.isFinite(x)||!Number.isFinite(y))throw new Error('유효한 측정값이 없습니다.');
+          if(x<0||y<0)throw new Error('음수 측정값은 그래프에 기록할 수 없습니다.');
+          if(!shouldRecordVoltage(x)) {
+            // Keep the graph, record count, animation and experiment step unchanged.
+            const baseline=Math.max(previousRecordedVoltage,lastGuidedVoltage ?? previousRecordedVoltage);
+            if(x-baseline >= GUIDE_MAX_VOLTAGE_RISE-1e-9) {
+              log('기록 생략: 전압 증가 2 V 이상 · '+x.toFixed(3)+' V');
+              if(nextBatteryCount<=5) {
+                const setup=nextBatteryCount===0?'건전지를 연결하지 않은 상태(0개)':('건전지 '+nextBatteryCount+'개를 직렬로 연결한 상태');
+                showExperimentMessage('전압 차이가 너무 큽니다. 지금은 '+setup+'에서 측정하세요.');
+              } else showExperimentMessage('실험이 끝났습니다.\n그래프를 해석하여 하단의 결과를 정리하여 제출하세요.',true);
+            } else log('기록 생략: 전압 증가 0.5 V 미만 또는 전압 감소 · '+x.toFixed(3)+' V');
+            return;
+          }
+          live.points=live.points.filter(p=>p.x!==x);
+          live.points.push({x,y});live.points.sort((a,b)=>a.x-b.x);
+          const finished=await renderLive(x);
+          if(!finished || generation!==snapshotGeneration)return;
+          showToast('현재값을 한 점 기록했습니다.');
+          advanceExperiment(x);
+        } catch(error) {
+          log('현재 값 측정: '+error.message);
+          if(generation===snapshotGeneration) showToast(error.message);
+        } finally {
+          measurementBusy=false;btn.textContent='현재 값 측정';
+          updateUnifiedConnection();
+        }
+      }
+      function stopMeasurement() {
+        snapshotGeneration++;
+        state.isRunning=false;voltageSensor.running=false;
+      }
+
+      function resetGraph() {
+        nextBatteryCount=0;
+        previousRecordedVoltage=null;lastGuidedVoltage=null;
+        document.getElementById('nextStepDialog').close();
+        if(calibration.ready) showExperimentMessage('건전지를 연결하지 않은 상태(0개, 0V)에서 전압과 전류를 측정하세요.');
+        snapshotGeneration++;
+        state.points = [];
+        live.points=[];live.lastSample=0;
+        state.elapsedSec = 0;
+        chart.options.scales.x.min = 0;
+        chart.options.scales.x.max = 7.5;
+        chart.data.datasets[0].data = [];
+        renderRecords();
+        const currentCalibrated = state.rawCurrent === null ? null : state.rawCurrent - state.tareOffset;
+        document.getElementById('currentValue').textContent = currentCalibrated !== null
+          ? (currentCalibrated >= 0 ? '+' : '') + currentCalibrated.toFixed(3)
+          : '—';
+      }
+
+      async function connectBle() {
+        if (!state.isSupportedDevice || !navigator.bluetooth) {
+          showToast('지원되지 않는 기기 또는 브라우저입니다.');
+          return;
+        }
+
+        if (activeDevice && activeDevice.gatt.connected) { activeDevice.gatt.disconnect(); return; }
+        document.getElementById('btnBleConnect').disabled = true;
+        const currentSession = ++session;
+        try {
+          // Strict BLE scan filter: only scan ScienceCube wireless sensors (blocks unsupported general BLE devices)
+          const scanFilters = ALLOWED_PREFIXES.map(function (prefix) {
+            return { namePrefix: prefix };
+          });
+
+          const device = activeDevice || await navigator.bluetooth.requestDevice({
+            filters: scanFilters,
+            optionalServices: SUPPORTED_SERVICES
+          });
+
+          if(voltageSensor.device && device.id === voltageSensor.device.id) throw new Error('전압 센서와 다른 WL102C 전류 센서를 선택해 주세요.');
+          activeDevice = device;
+          state.packetCount = 0; state.rawCurrent = null; state.lastReceivedMs = 0;
+          decodedCount = 0; receiveBuffer = [];
+          document.getElementById('currentValue').textContent = '—';
+          const name = (device && device.name) ? device.name : '';
+          const isAllowedName = ALLOWED_PREFIXES.some(function (prefix) {
+            return name.toUpperCase().indexOf(prefix.toUpperCase()) === 0;
+          });
+
+          if (!isAllowedName) {
+            showToast('지원되지 않는 기기입니다.');
+            return;
+          }
+
+          document.getElementById('statusText').textContent = name + ' 확인 중...';
+
+          device.addEventListener('gattserverdisconnected', function () {
+            if (currentSession !== session) return;
+            stopMeasurement(false);
+            writeChannel = null; receiveBuffer = [];
+            log((intentionalDisconnect ? '수동' : '예기치 않은') + ' 연결 해제 · 마지막 수신 ' + (state.lastReceivedMs ? ((performance.now()-state.lastReceivedMs)/1000).toFixed(1) : '없음') + '초 전 · 마지막 전송 ' + ((performance.now()-lastTransmitMs)/1000).toFixed(1) + '초 전 · 페이지 ' + document.visibilityState);
+            document.getElementById('currentValue').textContent = '—';
+            state.isConnected = false;
+            setControlsEnabled(false);
+            document.getElementById('statusDot').className = 'w-2.5 h-2.5 rounded-full bg-slate-300';
+            document.getElementById('statusText').textContent = '블루투스 미연결';
+            document.getElementById('bleBtnText').textContent = '센서 재연결';
+            showToast('센서 연결이 해제되었습니다.');
+          });
+
+          let server;
+          for(let attempt=0; attempt<3; attempt++) {
+            try { server = await device.gatt.connect(); break; }
+            catch(error) {
+              log('GATT 연결 시도 ' + (attempt+1) + ' 실패: ' + error.message);
+              if(attempt === 2 || error.name !== 'NetworkError') throw error;
+              await new Promise(resolve=>setTimeout(resolve,500*(attempt+1)));
+            }
+          }
+          const service = await server.getPrimaryService('49535343-fe7d-4ae5-8fa9-9fafd205e455');
+          const notify = await service.getCharacteristic('49535343-1e4d-4bd9-ba61-23c647249616');
+          writeChannel = await service.getCharacteristic('49535343-8841-43f4-a8d4-ecbe34729bb3');
+          notify.addEventListener('characteristicvaluechanged', e => {
+            if(currentSession === session) receivePacket(notify,e.target.value);
+          });
+          await notify.startNotifications();
+          log('WL102C 전용 수신 / 쓰기 채널 준비 완료');
+          state.isConnected = true;
+          setControlsEnabled(true);
+          document.getElementById('statusDot').className = 'w-2.5 h-2.5 rounded-full bg-emerald-500';
+          document.getElementById('statusText').textContent = name + ' 연결됨 · 수신 확인 중';
+          document.getElementById('bleBtnText').textContent = '연결 해제';
+          showToast('연결 완료. 두 센서 연결 후 현재 값 측정을 눌러 주세요.');
+          lastIdleRequest = performance.now();
+          await sendCommand(83);
+          setTimeout(()=>{ if(currentSession === session && state.isConnected && decodedCount === 0) log('아직 전류 응답 없음. 현재 값 측정 후에도 없으면 진단 기록을 저장해 주세요.'); },5000);
+        } catch (err) {
+          log('ERROR ' + err.name + ': ' + err.message);
+          if(activeDevice && activeDevice.gatt.connected) activeDevice.gatt.disconnect();
+          const msg = err && err.message ? err.message : '';
+          if (msg.indexOf('User cancelled') === -1) {
+            showToast(err.name + ': ' + msg);
+          }
+        } finally { connecting = false; document.getElementById('btnBleConnect').disabled = false; }
+      }
+
+      function markCalibration(sensor) {
+        if(!state.isConnected || !voltageSensor.connected)return;
+        calibration[sensor]=true;
+        if(calibration.current && calibration.voltage && !calibration.ready) {
+          calibration.ready=true;
+          showExperimentMessage('영점 조절이 끝났습니다. 건전지를 연결하지 않은 상태(0개, 0V)에서 전압과 전류를 측정하세요.');
+        } else if(!calibration.ready) {
+        }
+        updateUnifiedConnection();
+      }
+      function updateButtonHints() {
+        const both=state.isConnected && voltageSensor.connected;
+        const current=document.getElementById('btnZero');
+        const voltage=document.getElementById('voltageZero');
+        const measure=document.getElementById('btnStartStop');
+        current.classList.toggle('action-pulse',both && !calibration.current && !current.disabled);
+        voltage.classList.toggle('action-pulse',both && !calibration.voltage && !voltage.disabled);
+        measure.classList.toggle('action-pulse',both && calibration.ready && nextBatteryCount<=5 && !measurementBusy && !measure.disabled);
+      }
+      function updateUnifiedConnection() {
+        const count = Number(state.isConnected)+Number(voltageSensor.connected);
+        if(count===2 && !calibration.bothConnected) {
+          calibration.bothConnected=true;
+          calibration.current=false;calibration.voltage=false;calibration.ready=false;
+          showExperimentMessage('영점 조절을 하세요.');
+        } else if(count!==2) {
+          calibration.bothConnected=false;calibration.current=false;calibration.voltage=false;calibration.ready=false;
+        }
+        document.getElementById('btnStartStop').disabled=count!==2 || !calibration.ready || measurementBusy || unifiedConnecting || voltageSensor.connecting;
+        document.getElementById('btnBleConnect').disabled=unifiedConnecting || connecting || voltageSensor.connecting || !state.isSupportedDevice;
+        document.getElementById('bleBtnText').textContent=count===2?'블루투스 연결 해제':count===1?'센서 추가 연결 (1/2)':'블루투스 연결';
+        updateButtonHints();
+      }
+      async function connectSensors() {
+        if(unifiedConnecting)return;
+        if(state.isConnected && voltageSensor.connected) {
+          intentionalDisconnect=true;
+          activeDevice.gatt.disconnect();voltageSensor.device.gatt.disconnect();
+          updateUnifiedConnection();return;
+        }
+        if(!navigator.bluetooth) {showToast('Chrome 또는 Edge에서 열어 주세요.');return;}
+        unifiedConnecting=true;updateUnifiedConnection();
+        try {
+          const prefixes=[];
+          if(!state.isConnected)prefixes.push('SC:CURR','WL102','WL 102');
+          if(!voltageSensor.connected)prefixes.push('SC:VOLT','WL101','WL 101');
+          // One chooser per click preserves Web Bluetooth user activation.
+          const device=await navigator.bluetooth.requestDevice({filters:prefixes.map(namePrefix=>({namePrefix})),optionalServices:SUPPORTED_SERVICES});
+          if(/^(SC:VOLT|WL\s?101)/i.test(device.name || '')) {
+            voltageSensor.device=device;await connectVoltage();
+          } else if(/^(SC:CURR|WL\s?102)/i.test(device.name || '')) {
+            activeDevice=device;intentionalDisconnect=false;await connectBle();
+          } else throw new Error('WL102C 또는 WL101V 센서를 선택해 주세요.');
+        } catch(error) {log('센서 연결: '+error.name+': '+error.message);if(error.name!=='NotFoundError')showToast(error.message);}
+        finally {unifiedConnecting=false;updateUnifiedConnection();}
+      }
+      document.getElementById('btnBleConnect').addEventListener('click',connectSensors);
+      // Reflect unexpected disconnections from either independent channel.
+      setInterval(updateUnifiedConnection,1000);
+
+
+      document.getElementById('btnStartStop').addEventListener('click', function () {
+        if (!state.isConnected) return;
+        if (state.isRunning) {
+          stopMeasurement();
+        } else {
+          startMeasurement();
+        }
+      });
+
+      document.getElementById('btnZero').addEventListener('click', function () {
+        if (!state.isConnected || state.rawCurrent === null) { showToast('해석된 전류값이 없어 영점을 설정할 수 없습니다.'); return; }
+        state.tareOffset = state.rawCurrent;
+        document.getElementById('currentValue').textContent = '+0.000';
+        showToast('영점 조절 완료');
+        markCalibration('current');
+      });
+
+      document.getElementById('btnReset').addEventListener('click', function () {
+        resetGraph();
+        showToast('그래프가 초기화되었습니다.');
+      });
+
+      document.addEventListener('visibilitychange',()=>log('페이지 상태 ' + document.visibilityState));
+      window.addEventListener('load', function () {
+        checkDeviceSupport();
+      });
+/* Bridge loaded inside the original experiment closure. */
+const classroom = {code:'',group:null,token:'',busy:false,joined:false};
+const classroomBar=document.createElement('div');
+classroomBar.style.cssText='position:sticky;top:0;z-index:99;background:#244638;color:white;padding:12px 20px;font:16px sans-serif;';
+classroomBar.textContent='수업에 참여하면 실험 과정이 교사에게 전송됩니다.';
+document.body.prepend(classroomBar);
+const joinPanel=document.createElement('div');
+joinPanel.style.cssText='position:fixed;inset:0;z-index:200;background:#edf1eb;display:grid;place-items:center;font:18px sans-serif';
+joinPanel.innerHTML='<form style="background:white;padding:32px;border-radius:20px;width:min(440px,95vw)"><h1>수업 참여</h1><label>6자리 참여 코드<br><input name="code" inputmode="numeric" pattern="[0-9]{6}" required style="font:inherit;padding:12px;width:100%;box-sizing:border-box"></label><p>다음 화면에서 우리 조를 선택하세요.</p><button style="background:#315e4e;color:white;padding:14px;border:0;border-radius:10px;font:inherit">참여하기</button><p role="alert" id="joinError"></p></form>';
+document.body.append(joinPanel);
+joinPanel.querySelector('input').value=new URLSearchParams(location.search).get('code')||'';
+joinPanel.querySelector('form').onsubmit=e=>{e.preventDefault();classroom.code=joinPanel.querySelector('input').value;joinPanel.remove();};
+document.querySelectorAll('[data-group]').forEach(button=>{
+  // Capture first; original listener executes only after server accepts ownership.
+  button.addEventListener('click',async e=>{
+    if(classroom.joined)return;
+    e.preventDefault();e.stopImmediatePropagation();
+    if(classroom.busy)return;
+    classroom.busy=true;
+    const group=Number(button.dataset.group), key='classroom:'+classroom.code+':'+group;
+    try {
+      const saved=JSON.parse(localStorage.getItem(key)||'{}');
+      const r=await fetch('/api/join',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:classroom.code,group,token:saved.token||''})});
+      const data=await r.json();if(!r.ok)throw Error(data.error);
+      Object.assign(classroom,{group,token:data.token,joined:true});
+      localStorage.setItem(key,JSON.stringify({token:data.token}));
+      if(data.state.points){live.points=data.state.points;nextBatteryCount=data.state.step||0;renderRecords();}
+      for(const id of ['answer1','answer2'])document.getElementById(id).value=data.state[id]||'';
+      button.click();
+      classroomBar.textContent=classroom.code+' · '+group+'조 · 교사에게 연결 중';
+    }catch(err){alert(err.message);}finally{classroom.busy=false;}
+  },true);
+});
+async function classroomSync(){
+  if(!classroom.joined||classroom.busy)return;
+  classroom.busy=true;
+  try{
+    const stateSnapshot={voltage:document.getElementById('voltageValue').textContent,current:document.getElementById('currentValue').textContent,status:document.getElementById('statusText').textContent,connected:state.isConnected&&voltageSensor.connected,step:nextBatteryCount,points:live.points.slice(0,1000).map(p=>({x:p.x,y:p.y})),answer1:document.getElementById('answer1').value,answer2:document.getElementById('answer2').value};
+    const r=await fetch('/api/update',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:classroom.code,group:classroom.group,token:classroom.token,state:stateSnapshot}),signal:AbortSignal.timeout(8000)});
+    const data=await r.json();if(!r.ok)throw Error(data.error);
+    classroomBar.textContent=classroom.code+' · '+classroom.group+'조 · 전송 완료 '+new Date().toLocaleTimeString('ko-KR');
+  }catch(err){classroomBar.textContent='전송 대기 · '+err.message+' (연결되면 자동 재전송)';}
+  finally{classroom.busy=false;}
+}
+setInterval(classroomSync,1000);
+if(!window.isSecureContext)classroomBar.textContent='블루투스 센서 연결에는 HTTPS 주소가 필요합니다.';
+
+    })();
+  </script>
+</body>
+</html>
